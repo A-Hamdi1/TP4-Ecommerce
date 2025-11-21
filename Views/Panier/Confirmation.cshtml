@@ -1,0 +1,46 @@
+﻿@model WebApplication2.Models.Order
+
+<section class="py-5">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-xl shadow p-6 max-w-2xl mx-auto">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">Order Successfully Validated!</h1>
+            </div>
+            <p class="text-gray-500 mb-4">Thank you for your purchase, <strong>@Model.CustomerName</strong>! Your order has been recorded.</p>
+
+            <h2 class="text-lg font-semibold text-gray-800 mt-4 mb-2">Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="text-xs text-gray-500 mb-1">Order number</div>
+                    <div class="font-semibold text-gray-800">@Model.Id</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="text-xs text-gray-500 mb-1">Date</div>
+                    <div class="font-semibold text-gray-800">@Model.OrderDate.ToString("MM/dd/yyyy at HH:mm")</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="text-xs text-gray-500 mb-1">Total amount</div>
+                    <div class="font-semibold text-gray-800">@Model.TotalAmount</div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="text-xs text-gray-500 mb-1">Delivery address</div>
+                    <div class="font-semibold text-gray-800">@Model.Address</div>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6 pt-6 border-t border-gray-200">
+                <a asp-controller="Product" asp-action="Index" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium flex items-center gap-2 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

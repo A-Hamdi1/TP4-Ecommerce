@@ -1,0 +1,51 @@
+﻿@model WebApplication2.Models.Category
+@{
+    ViewData["Title"] = "Create category";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-xl shadow p-6 max-w-lg mx-auto">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <h4 class="mb-0 text-indigo-600 font-semibold text-xl">New Category</h4>
+            </div>
+            <form asp-action="Create" novalidate>
+                <div asp-validation-summary="ModelOnly" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4"></div>
+
+                <div class="mb-4">
+                    <label asp-for="CategoryName" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                    <input asp-for="CategoryName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Category name" />
+                    <span asp-validation-for="CategoryName" class="text-red-500 text-sm"></span>
+                </div>
+
+                <div class="flex justify-between gap-3 pt-6 border-t border-gray-200">
+                    <a asp-action="Index" 
+                       class="px-6 py-3 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                       title="Cancel">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium btn-hover-lift"
+                            title="Create">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Create Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

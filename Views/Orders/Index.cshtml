@@ -1,0 +1,96 @@
+@model IEnumerable<WebApplication2.Models.Order>
+@using WebApplication2.Models
+@{
+    ViewData["Title"] = "My orders";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-1">My Orders</h1>
+            <p class="text-gray-500 text-sm">View and track your order history</p>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full table-responsive-card">
+                        <thead class="bg-gray-50 hidden md:table-header-group">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Total</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                                <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            @foreach (var o in Model)
+                            {
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-4 py-3" data-label="ID">
+                                        <span class="font-semibold text-gray-800">#@o.Id</span>
+                                    </td>
+                                    <td class="px-4 py-3" data-label="Date">
+                                        <span class="text-sm text-gray-600 flex items-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            @o.OrderDate.ToLocalTime().ToString("g")
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3" data-label="Total">
+                                        <span class="font-bold text-indigo-600 text-lg">@o.TotalAmount.ToString("F2") €</span>
+                                    </td>
+                                    <td class="px-4 py-3" data-label="Status">
+                                        @{
+                                            var statusClass = o.Status switch
+                                            {
+                                                OrderStatus.Pending => "bg-yellow-100 text-yellow-800",
+                                                OrderStatus.Paid => "bg-blue-100 text-blue-800",
+                                                OrderStatus.Processing => "bg-indigo-100 text-indigo-800",
+                                                OrderStatus.Shipped => "bg-blue-100 text-blue-800",
+                                                OrderStatus.Delivered => "bg-green-100 text-green-800",
+                                                OrderStatus.Cancelled => "bg-red-100 text-red-800",
+                                                _ => "bg-gray-100 text-gray-800"
+                                            };
+                                        }
+                                        <span class="px-3 py-1 rounded-full text-xs font-medium @statusClass">@o.Status</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right" data-label="Actions">
+                                        <a class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg text-sm hover:bg-indigo-100 transition flex items-center gap-2 font-medium inline-flex" href="/Orders/Details/@o.Id">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                            Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state bg-white rounded-xl shadow p-12 text-center">
+                <div class="empty-state-icon">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <h5 class="empty-state-title">No orders</h5>
+                <p class="empty-state-message">You haven't placed any orders yet. Start shopping to see your orders here!</p>
+                <a href="/Product/Index" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    View Products
+                </a>
+            </div>
+        }
+    </div>
+</section>

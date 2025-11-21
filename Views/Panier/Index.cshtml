@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "My cart";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <h2 class="text-2xl font-bold text-gray-800 mb-3">My cart</h2>
+        @if (ViewBag.Liste.Count > 0)
+        {
+            <div class="bg-white rounded-xl shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full table-responsive-card">
+                        <thead class="bg-gray-50 hidden md:table-header-group">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Product</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Details</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700" style="width:220px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                        @foreach (var item in ViewBag.Liste)
+                        {
+                            <tr id="row-@item.Prod.ProductId" class="cart-item">
+                                <td class="px-4 py-3" style="width:260px" data-label="Product">
+                                    <img src="~/images/@item.Prod.Image" class="rounded-lg w-full max-w-[240px] h-40 object-cover" alt="@item.Prod.Name" />
+                                </td>
+                                <td class="px-4 py-3" data-label="Details">
+                                    <div class="font-semibold text-gray-800 text-lg mb-1">@item.Prod.Name</div>
+                                    <div class="text-gray-500 text-sm mb-3">@item.Prod.Category.CategoryName</div>
+                                    <div class="mb-2">
+                                        <span class="text-sm text-gray-600">Quantity: </span>
+                                        <span id="quantite_@item.Prod.ProductId" class="quantity-value bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg text-sm font-semibold">@item.quantite</span>
+                                    </div>
+                                    <div class="text-sm">
+                                        <span class="text-gray-600">Subtotal: </span>
+                                        <span id="total_@item.Prod.ProductId" class="font-bold text-indigo-600 text-lg">@item.TotalPrice</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3" data-label="Actions">
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="#" class="PlusProducts quantity-btn bg-green-100 text-green-700 hover:bg-green-200 btn-hover-lift" data-id="@item.Prod.ProductId" title="Add">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="MinProducts quantity-btn bg-yellow-100 text-yellow-700 hover:bg-yellow-200 btn-hover-lift" data-id="@item.Prod.ProductId" title="Decrease">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="RemoveLink quantity-btn bg-red-100 text-red-700 hover:bg-red-200 btn-hover-lift" data-id="@item.Prod.ProductId" title="Remove">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl">
+                <div class="text-xl font-bold">
+                    <span class="text-gray-700">Total: </span>
+                    <span id="totalapayer" class="text-indigo-600 text-2xl">@ViewBag.total</span>
+                </div>
+                <div class="flex gap-3">
+                    <a href="~/Product/Index" class="bg-white text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors btn-hover-lift font-medium flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Continue Shopping
+                    </a>
+                    <a href="~/Panier/Checkout" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors btn-hover-lift font-medium shadow-lg flex items-center gap-2">
+                        Checkout
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center mt-8">
+                <img src="~/images/panier_vide.png" alt="Empty cart" class="mx-auto mb-4" style="width:200px;height:auto;" />
+                <h3 class="mt-3 text-gray-500 text-xl font-semibold">Your cart is empty!</h3>
+                <p class="text-gray-400 mb-4">Discover our products and treat yourself</p>
+                <a href="~/Product/Index" class="inline-block bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">View products</a>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/Monscript.js" type="text/javascript"></script>
+}

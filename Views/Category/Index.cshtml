@@ -1,0 +1,127 @@
+﻿@model IEnumerable<WebApplication2.Models.Category>
+@{
+    ViewData["Title"] = "Categories";
+}
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-1">Categories</h1>
+                <p class="text-gray-500 text-sm">Manage your product categories</p>
+            </div>
+            @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+            {
+                <a asp-action="Create" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium flex items-center gap-2 shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    New Category
+                </a>
+            }
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var category in Model)
+                {
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 text-center overflow-hidden group border border-gray-100 hover:border-indigo-200">
+                        <div class="p-8">
+                            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                </svg>
+                            </div>
+                            <h5 class="font-semibold text-gray-800 text-xl mb-2">@category.CategoryName</h5>
+                            <p class="text-gray-500 text-sm">Category</p>
+                        </div>
+                        <div class="border-t border-gray-100 p-4 bg-gray-50 flex justify-center flex-wrap gap-2">
+                            <a asp-action="Details" asp-route-id="@category.CategoryId" 
+                               class="w-10 h-10 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                               title="View details">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </a>
+                            @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                            {
+                                <a asp-action="Edit" asp-route-id="@category.CategoryId" 
+                                   class="w-10 h-10 flex items-center justify-center bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                                   title="Edit">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@category.CategoryId" 
+                                   class="w-10 h-10 flex items-center justify-center bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                                   title="Delete">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <nav class="mt-8 flex justify-center items-center gap-2">
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" 
+                       class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Previous
+                    </a>
+                }
+                <ul class="flex gap-2">
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        var isActive = i == ViewBag.CurrentPage;
+                        <li>
+                            <a asp-action="Index" asp-route-page="@i" 
+                               class="@(isActive ? "bg-indigo-600 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-100") px-4 py-2 rounded-lg border border-gray-300 transition font-medium">
+                                @i
+                            </a>
+                        </li>
+                    }
+                </ul>
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" 
+                       class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition flex items-center gap-2">
+                        Next
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                }
+            </nav>
+        }
+        else
+        {
+            <div class="empty-state bg-white rounded-xl shadow p-12 text-center">
+                <div class="empty-state-icon">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                </div>
+                <h5 class="empty-state-title">No categories created yet</h5>
+                <p class="empty-state-message">Get started by creating your first category</p>
+                <a class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium inline-flex items-center gap-2" asp-action="Create">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create a category
+                </a>
+            </div>
+        }
+    </div>
+</section>

@@ -1,0 +1,42 @@
+﻿@model WebApplication2.ViewModels.CreateRoleViewModel
+@{
+    ViewBag.Title = "Create new role";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-center">
+            <div class="w-full max-w-md">
+                <div class="bg-white rounded-xl shadow p-6">
+                    <div class="text-center mb-6">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-3">
+                            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                        <h4 class="mb-0 text-indigo-600 font-semibold text-2xl">Create New Role</h4>
+                        <p class="text-gray-500 text-sm mt-1">Add a new role to your system</p>
+                    </div>
+                    <form asp-action="CreateRole" method="post" novalidate>
+                        <div asp-validation-summary="All" class="text-red-500 text-sm mb-3"></div>
+                        <div class="mb-4">
+                            <label asp-for="RoleName" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                            <input asp-for="RoleName" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Role name">
+                            <span asp-validation-for="RoleName" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="w-full">
+                            <button type="submit" 
+                                    class="w-full px-6 py-3 flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium btn-hover-lift"
+                                    title="Create role">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Create Role
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,47 @@
+﻿@model WebApplication2.Models.Category
+
+@{
+    ViewData["Title"] = "Category details";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-xl shadow p-6 max-w-lg mx-auto">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                </div>
+                <h4 class="mb-0 text-indigo-600 font-semibold text-xl">Category Details</h4>
+            </div>
+            <dl class="grid grid-cols-1 gap-4 mb-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Category name</dt>
+                    <dd class="text-gray-800 font-medium text-lg">@Html.DisplayFor(model => model.CategoryName)</dd>
+                </div>
+            </dl>
+            <div class="flex justify-between gap-3">
+                @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Manager")))
+                {
+                    <a asp-action="Edit" asp-route-id="@Model?.CategoryId" 
+                       class="px-6 py-3 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                       title="Edit">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                    </a>
+                }
+                <a asp-action="Index" 
+                   class="px-6 py-3 flex items-center justify-center gap-2 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                   title="Back to list">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

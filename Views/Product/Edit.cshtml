@@ -1,0 +1,200 @@
+﻿@model WebApplication2.ViewModels.EditViewModel
+@{
+    ViewData["Title"] = "Edit product";
+    var photoPath = Url.Content("~/images/" + (Model.ExistingImagePath ?? "noimage.jpg"));
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="bg-white rounded-xl shadow p-6 max-w-3xl mx-auto">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <h4 class="mb-0 text-yellow-600 font-semibold text-xl">Edit product</h4>
+            </div>
+            <form asp-controller="Product" asp-action="Edit" enctype="multipart/form-data" method="post" novalidate>
+                <div asp-validation-summary="All" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4"></div>
+
+                <input type="hidden" asp-for="ProductId" />
+                <input type="hidden" asp-for="ExistingImagePath" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Name" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Product name" />
+                        <span asp-validation-for="Name" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Price" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Price" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Price in DT" />
+                        <span asp-validation-for="Price" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div>
+                        <label asp-for="QteStock" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="QteStock" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Quantity" />
+                        <span asp-validation-for="QteStock" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="CategoryId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="CategoryId" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" asp-items="ViewBag.CategoryId">
+                            <option value="">-- Select a category --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-red-500 text-sm"></span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="ImagePath" class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-400 transition-colors" id="dropZone">
+                            <input asp-for="ImagePath" type="file" class="hidden" id="imageInput" accept="image/*" />
+                            <div class="space-y-2">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 8m8 8l-8 8m0 0l-8-8m8 8V8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="imageInput" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                        <span>Upload a file</span>
+                                    </label>
+                                    <p class="pl-1">or drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                        </div>
+                        <span asp-validation-for="ImagePath" class="text-red-500 text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <div class="relative inline-block">
+                        <img id="imageEmp" src="@photoPath" asp-append-version="true" class="inline-block border border-gray-300 rounded-lg shadow-sm max-w-[200px] h-auto" alt="Product Image" />
+                        <button type="button" id="removeImageBtn" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition hidden" title="Remove image">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-between gap-3 mt-6">
+                    <a asp-action="Index" asp-controller="Product" 
+                       class="px-6 py-3 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-sm hover:shadow-md font-medium"
+                       title="Cancel">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Cancel
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 flex items-center justify-center gap-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg font-medium btn-hover-lift"
+                            title="Update">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageInput = document.getElementById('imageInput');
+            const imageEmp = document.getElementById('imageEmp');
+            const dropZone = document.getElementById('dropZone');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+            
+            // Show remove button if image exists
+            if (imageEmp && imageEmp.src && !imageEmp.src.includes('noimage.jpg')) {
+                removeImageBtn.classList.remove('hidden');
+            }
+
+            // File input change
+            if (imageInput && imageEmp) {
+                imageInput.addEventListener('change', function () {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            imageEmp.src = e.target.result;
+                            removeImageBtn.classList.remove('hidden');
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+
+            // Drag and drop
+            if (dropZone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, preventDefaults, false);
+                });
+
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, () => {
+                        dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, () => {
+                        dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+                    }, false);
+                });
+
+                dropZone.addEventListener('drop', handleDrop, false);
+
+                function handleDrop(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files.length > 0 && imageInput) {
+                        imageInput.files = files;
+                        const event = new Event('change', { bubbles: true });
+                        imageInput.dispatchEvent(event);
+                    }
+                }
+            }
+
+            // Remove image
+            if (removeImageBtn) {
+                removeImageBtn.addEventListener('click', function() {
+                    if (imageInput) imageInput.value = '';
+                    if (imageEmp) imageEmp.src = '@Url.Content("~/images/noimage.jpg")';
+                    this.classList.add('hidden');
+                });
+            }
+
+            // Form change detection
+            const form = document.querySelector('form');
+            let formChanged = false;
+            if (form) {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('change', () => {
+                        formChanged = true;
+                    });
+                });
+
+                form.addEventListener('submit', function(e) {
+                    if (!confirm('Are you sure you want to save these changes?')) {
+                        e.preventDefault();
+                    }
+                });
+
+                window.addEventListener('beforeunload', function(e) {
+                    if (formChanged) {
+                        e.preventDefault();
+                        e.returnValue = '';
+                    }
+                });
+            }
+        });
+    </script>
+}

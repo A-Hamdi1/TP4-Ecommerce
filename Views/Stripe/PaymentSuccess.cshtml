@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Payment successful";
+    var orderId = ViewBag.OrderId as int? ?? 0;
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-center">
+            <div class="w-full max-w-lg">
+                <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+                    <div class="mb-6">
+                        <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4 animate-bounce">
+                            <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-3xl font-bold text-gray-800 mb-3">Payment Successful!</h2>
+                    <p class="text-gray-600 mb-1">Your payment has been processed</p>
+                    <p class="text-gray-500 mb-6">
+                        Order <strong class="text-indigo-600">#@orderId</strong> has been confirmed
+                    </p>
+                    
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-6">
+                        <div class="flex items-center justify-center gap-3 mb-3">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <strong class="text-gray-800 text-lg">Confirmation Email</strong>
+                        </div>
+                        <p class="text-gray-600 text-sm">You will receive a confirmation email shortly with all the details of your order.</p>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row gap-3 justify-center">
+                        <a href="/Orders/Details/@orderId" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium flex items-center justify-center gap-2 shadow-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View My Order
+                        </a>
+                        <a href="/Product/Index" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition btn-hover-lift font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

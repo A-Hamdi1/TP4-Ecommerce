@@ -1,0 +1,27 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-red-600 text-3xl font-bold mb-2">Error.</h1>
+    <h2 class="text-red-500 text-xl font-semibold mb-4">An error occurred while processing your request.</h2>
+
+    @if (Model.ShowRequestId)
+    {
+        <p class="mb-4">
+            <strong>Request ID:</strong> <code class="bg-gray-100 px-2 py-1 rounded">@Model.RequestId</code>
+        </p>
+    }
+
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">Development Mode</h3>
+    <p class="text-gray-600 mb-2">
+        Switching to <strong>Development</strong> mode will display more detailed information about the error that occurred.
+    </p>
+    <p class="text-gray-600">
+        <strong>The Development mode should not be enabled for deployed applications.</strong>
+        It can result in displaying sensitive information from exceptions to end users.
+        For local debugging, enable the <strong>Development</strong> mode by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+        and restart the application.
+    </p>
+</div>

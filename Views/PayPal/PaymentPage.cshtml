@@ -1,0 +1,127 @@
+@{
+    ViewData["Title"] = "PayPal payment";
+    var totalAmount = ViewBag.TotalAmount as float? ?? 0f;
+    var clientId = ViewBag.ClientId as string;
+    var useSandbox = ViewBag.UseSandbox as bool? ?? true;
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-center">
+            <div class="w-full max-w-lg">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-0">PayPal Payment</h2>
+                    </div>
+                    <p class="text-gray-500 mb-6">
+                        Click the button below to complete your payment via PayPal.
+                    </p>
+
+                    <div id="paypal-button-container" class="mb-4"></div>
+
+                    <div id="payment-message" class="hidden px-4 py-3 rounded-lg mb-4" role="alert"></div>
+
+                    <a href="/Panier/Index" class="w-full bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition btn-hover-lift font-medium flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Back to Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://www.paypal.com/sdk/js?client-id=@clientId&currency=USD&intent=capture"></script>
+<script>
+    (function() {
+        const totalAmount = parseFloat('@totalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)');
+        
+        if (!totalAmount || totalAmount <= 0 || isNaN(totalAmount)) {
+            const messageEl = document.getElementById('payment-message');
+            messageEl.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg';
+            messageEl.textContent = 'Error: Invalid amount.';
+            messageEl.classList.remove('hidden');
+            return;
+        }
+
+        paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color: 'blue',
+                shape: 'rect',
+                label: 'paypal'
+            },
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    intent: 'CAPTURE',
+                    purchase_units: [{
+                        amount: {
+                            value: totalAmount.toFixed(2),
+                            currency_code: 'USD'
+                        },
+                        description: 'E-commerce order PhantomShop',
+                        reference_id: 'ORDER_' + Date.now()
+                    }],
+                    application_context: {
+                        brand_name: 'PhantomShop',
+                        landing_page: 'NO_PREFERENCE',
+                        user_action: 'PAY_NOW'
+                    }
+                }).catch(function(err) {
+                    console.error('Error creating PayPal order:', err);
+                    throw err;
+                });
+            },
+            onApprove: function(data, actions) {
+                const messageEl = document.getElementById('payment-message');
+                messageEl.className = 'bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg';
+                messageEl.textContent = 'Processing payment...';
+                messageEl.classList.remove('hidden');
+                
+                return fetch('/PayPal/CapturePayment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ OrderId: data.orderID }),
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        window.location = '/PayPal/PaymentSuccess?orderId=' + result.orderId;
+                    } else {
+                        messageEl.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg';
+                        messageEl.textContent = 'Error capturing payment: ' + (result.error || 'Unknown error');
+                        messageEl.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    messageEl.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg';
+                    messageEl.textContent = 'Error: ' + (error.error || error.message || 'Unknown error');
+                    messageEl.classList.remove('hidden');
+                });
+            },
+            onCancel: function(data) {
+                window.location = '/PayPal/PaymentCancel';
+            },
+            onError: function(err) {
+                console.error('PayPal Error:', err);
+                const messageEl = document.getElementById('payment-message');
+                messageEl.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg';
+                messageEl.textContent = 'PayPal error: ' + (err.message || err);
+                messageEl.classList.remove('hidden');
+            }
+        }).render('#paypal-button-container');
+    })();
+</script>

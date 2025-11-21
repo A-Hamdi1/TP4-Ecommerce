@@ -1,0 +1,191 @@
+﻿@model IEnumerable<WebApplication2.Models.Product>
+@{
+    ViewData["Title"] = "Products";
+}
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject WebApplication2.Models.Repositories.ICategoryRepository CategoryRepository
+
+@{
+    var isSignedIn = SignInManager.IsSignedIn(User);
+    var isAuthorized = User.IsInRole("Admin") || User.IsInRole("Manager");
+    var categories = CategoryRepository.GetAll();
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Fixed categories sidebar -->
+            <div class="w-full lg:w-64 flex-shrink-0">
+                <div class="sticky top-4">
+                    <div class="bg-white rounded-xl shadow-sm mb-3">
+                        <div class="border-b border-gray-200 px-3 py-2 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            <h5 class="mb-0 font-semibold text-gray-800">Categories</h5>
+                        </div>
+                        <ul class="divide-y divide-gray-100">
+                            @if (!categories.Any())
+                            {
+                                <li class="px-3 py-2 text-gray-400 italic text-sm">No categories available.</li>
+                            }
+                            else
+                            {
+                                @foreach (var categorie in categories)
+                                {
+                                    <li class="px-3 py-2 hover:bg-gray-50 transition-colors">
+                                        <a class="text-gray-700 font-medium hover:text-indigo-600"
+                                           asp-action="Index"
+                                           asp-route-categoryId="@categorie.CategoryId">
+                                            @categorie.CategoryName
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products content -->
+            <div class="flex-1">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-1">Products</h1>
+                        <p class="text-gray-500 text-sm">Browse our product catalog</p>
+                    </div>
+                    @if (isSignedIn && isAuthorized)
+                    {
+                        <a asp-action="Create" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium flex items-center gap-2 shadow-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            New Product
+                        </a>
+                    }
+                </div>
+
+                @if (!Model.Any())
+                {
+                    <div class="empty-state bg-white rounded-xl shadow p-12 text-center">
+                        <div class="empty-state-icon">
+                            <svg class="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        </div>
+                        <h5 class="empty-state-title">No products available</h5>
+                        <p class="empty-state-message">No products found in this category. Please come back later or choose another category.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach (var product in Model)
+                        {
+                            var photoPath = Url.Content("~/images/" + (product.Image ?? "noimage.jpg"));
+                            <div class="product-card bg-white rounded-xl shadow-sm overflow-hidden">
+                                <div class="product-card-image-wrapper">
+                                    <img src="@photoPath" class="w-full h-48 object-cover" alt="Product image" />
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <h5 class="font-semibold text-gray-800 mb-0">@product.Name</h5>
+                                        @if (isSignedIn && User.IsInRole("User"))
+                                        {
+                                            <button class="text-red-500 hover:text-red-700 toggle-wishlist transition-colors" data-product-id="@product.ProductId" title="Add to wishlist">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                </svg>
+                                            </button>
+                                        }
+                                    </div>
+                                    <div class="text-sm text-gray-500 mb-2">@product.Category.CategoryName</div>
+                                    <div class="flex gap-2 mb-3">
+                                        <span class="product-badge product-badge-price">@product.Price DT</span>
+                                        <span class="product-badge product-badge-stock @(product.QteStock == 0 ? "out-of-stock" : (product.QteStock < 10 ? "low-stock" : ""))">Stock: @product.QteStock</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2 items-center">
+                                        <a asp-action="Details" asp-route-id="@product.ProductId" 
+                                           class="w-10 h-10 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                                           title="View details">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </a>
+                                        @if (isSignedIn && isAuthorized)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@product.ProductId" 
+                                               class="w-10 h-10 flex items-center justify-center bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                                               title="Edit">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@product.ProductId" 
+                                               class="w-10 h-10 flex items-center justify-center bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md"
+                                               title="Delete">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </a>
+                                        }
+                                        @if (isSignedIn && User.IsInRole("User"))
+                                        {
+                                            <a asp-controller="Panier" asp-action="AddProduct" asp-route-id="@product.ProductId" 
+                                               class="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg ml-auto"
+                                               title="Add to cart">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                </svg>
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @Html.AntiForgeryToken()
+
+                    <nav class="mt-8 flex justify-center items-center gap-2">
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <a asp-action="Index" asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@(ViewBag.CurrentPage - 1)" 
+                               class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Previous
+                            </a>
+                        }
+                        <ul class="flex gap-2">
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                var isActive = i == ViewBag.CurrentPage;
+                                <li>
+                                    <a asp-action="Index" asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@i" 
+                                       class="@(isActive ? "bg-indigo-600 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-100") px-4 py-2 rounded-lg border border-gray-300 transition font-medium">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <a asp-action="Index" asp-route-categoryId="@ViewBag.CategoryId" asp-route-page="@(ViewBag.CurrentPage + 1)" 
+                               class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition flex items-center gap-2">
+                                Next
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        }
+                    </nav>
+                }
+            </div>
+        </div>
+    </div>
+</section>

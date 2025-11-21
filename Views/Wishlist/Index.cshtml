@@ -1,0 +1,175 @@
+@model IEnumerable<WebApplication2.Models.WishlistItem>
+
+@{
+    ViewData["Title"] = "My wishlist";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-1">My Wishlist</h1>
+                <p class="text-gray-500 text-sm">Your saved favorite products</p>
+            </div>
+            <a href="@Url.Action("Index", "Home")" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-100 transition flex items-center gap-2 font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Continue Shopping
+            </a>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state bg-white rounded-xl shadow p-12 text-center">
+                <div class="empty-state-icon">
+                    <svg class="w-16 h-16 text-gray-300 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </div>
+                <h4 class="empty-state-title">Your wishlist is empty</h4>
+                <p class="empty-state-message">Browse our catalog and add products to your wishlist.</p>
+                <a href="@Url.Action("Index", "Home")" class="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Discover Our Products
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach (var item in Model)
+                {
+                    var photoPath = Url.Content("~/images/" + (item.Product.Image ?? "noimage.jpg"));
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition overflow-hidden">
+                        <img src="@photoPath" class="w-full h-48 object-cover" alt="@item.Product.Name">
+                        <div class="p-4">
+                            <h5 class="font-semibold text-gray-800 mb-1">@item.Product.Name</h5>
+                            <p class="text-gray-500 text-sm mb-3">@item.Product.Category.CategoryName</p>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-lg font-bold text-green-600">@item.Product.Price.ToString("F2") €</span>
+                                <div class="flex gap-2">
+                                    <button class="w-10 h-10 flex items-center justify-center bg-red-100 text-red-600 rounded-lg hover:bg-red-200 hover:scale-110 transition-all duration-200 shadow-sm hover:shadow-md toggle-wishlist" 
+                                            data-product-id="@item.ProductId"
+                                            title="Remove from wishlist">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    </button>
+                                    <a href="@Url.Action("Details", "Product", new { id = item.ProductId })" 
+                                       class="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 hover:scale-110 transition-all duration-200 shadow-md hover:shadow-lg"
+                                       title="View details">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="text-gray-400 text-xs border-t border-gray-100 pt-2">
+                                Added on @item.AddedDate.ToLocalTime().ToString("MMMM d, yyyy")
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toggle-wishlist').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const productId = this.getAttribute('data-product-id');
+                    if (!productId) {
+                        console.error('Product ID not found');
+                        return;
+                    }
+                    
+                    const buttonElement = this;
+                    const card = buttonElement.closest('.bg-white.rounded-xl');
+                    
+                    // Disable button during request
+                    buttonElement.disabled = true;
+                    const originalContent = buttonElement.innerHTML;
+                    buttonElement.innerHTML = '<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                    
+                    fetch('/Wishlist/ToggleWishlist/' + productId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        buttonElement.disabled = false;
+                        
+                        if (!data.success) {
+                            throw new Error(data.error || 'An error occurred');
+                        }
+                        
+                        if (data.isInWishlist) {
+                            buttonElement.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>';
+                        } else {
+                            // Remove card with animation
+                            if (card) {
+                                card.style.transition = 'opacity 0.3s ease-out';
+                                card.style.opacity = '0';
+                                setTimeout(() => {
+                                    card.remove();
+                                    // Check if there are remaining products
+                                    const remainingCards = document.querySelectorAll('.bg-white.rounded-xl');
+                                    if (remainingCards.length === 0) {
+                                        location.reload();
+                                    }
+                                }, 300);
+                            } else {
+                                location.reload();
+                            }
+                        }
+                        
+                        // Update counter in navbar if present
+                        if (data.count !== undefined) {
+                            const wishlistLinks = document.querySelectorAll('a[href*="Wishlist"]');
+                            wishlistLinks.forEach(wishlistLink => {
+                                let navCounter = wishlistLink.querySelector('span.bg-red-500, span[class*="bg-red"]');
+                                if (data.count > 0) {
+                                    if (!navCounter) {
+                                        navCounter = document.createElement('span');
+                                        navCounter.className = 'ml-1 bg-red-500 text-white rounded-full text-xs px-2 py-0.5';
+                                        wishlistLink.appendChild(navCounter);
+                                    }
+                                    navCounter.textContent = data.count;
+                                    navCounter.style.display = 'inline';
+                                } else {
+                                    if (navCounter) {
+                                        navCounter.style.display = 'none';
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        buttonElement.disabled = false;
+                        buttonElement.innerHTML = originalContent;
+                        alert('An error occurred while removing. Please try again.');
+                    });
+                });
+            });
+        });
+    </script>
+}

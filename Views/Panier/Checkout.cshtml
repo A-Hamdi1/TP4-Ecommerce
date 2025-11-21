@@ -1,0 +1,169 @@
+﻿@model WebApplication2.ViewModels.OrderViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<section class="py-4">
+    <div class="container mx-auto px-4">
+        <div class="mb-6">
+            <h2 class="text-3xl font-bold text-gray-800 mb-1">Checkout</h2>
+            <p class="text-gray-500 text-sm">Complete your order information</p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center gap-2 mb-6">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-gray-800 mb-0">Order Information</h3>
+                    </div>
+                    <form asp-controller="Panier" asp-action="Checkout" method="post">
+                        @Html.AntiForgeryToken()
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">@TempData["ErrorMessage"]</div>
+                        }
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">@TempData["SuccessMessage"]</div>
+                        }
+
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+                                <ul class="list-disc list-inside">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        <div class="mb-4">
+                            <label for="Address" class="block text-sm font-medium text-gray-700 mb-1">Delivery address <span class="text-red-500">*</span></label>
+                            <input type="text" asp-for="Address" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none @(ViewData.ModelState["Address"]?.Errors.Count > 0 ? "border-red-500" : "")" id="Address" name="Address" value="@Model.Address" required />
+                            <span asp-validation-for="Address" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label for="PaymentMethod" class="block text-sm font-medium text-gray-700 mb-1">Payment method <span class="text-red-500">*</span></label>
+                            <select asp-for="PaymentMethod" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none @(ViewData.ModelState["PaymentMethod"]?.Errors.Count > 0 ? "border-red-500" : "")" id="PaymentMethod" name="PaymentMethod" required>
+                                <option value="">Select a method</option>
+                                <option value="CreditCard">Credit card (Stripe)</option>
+                                <option value="Paypal">PayPal</option>
+                                <option value="CashOnDelivery">Cash on delivery</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-red-500 text-sm"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Total amount</label>
+                            <div class="font-semibold text-lg text-gray-800">@Model.TotalAmount</div>
+                            <input type="hidden" name="TotalAmount" value="@Model.TotalAmount" />
+                        </div>
+
+                        @if (Model.CartItems != null)
+                        {
+                            @for (int i = 0; i < Model.CartItems.Count; i++)
+                            {
+                                <input type="hidden" name="CartItems[@i].ProductName" value="@Model.CartItems[i].ProductName" />
+                                <input type="hidden" name="CartItems[@i].Quantity" value="@Model.CartItems[i].Quantity" />
+                                <input type="hidden" name="CartItems[@i].Price" value="@Model.CartItems[i].Price" />
+                            }
+                        }
+                        <div class="w-full pt-4 border-t border-gray-200">
+                            <button type="submit" id="submitOrderBtn" class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition btn-hover-lift font-medium flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span id="button-text">Place Order</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div>
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-0">Your Cart</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-700">Product</th>
+                                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-700">Qty</th>
+                                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-700">Price</th>
+                                    <th class="px-3 py-2 text-right text-xs font-medium text-gray-700">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @if (Model.CartItems != null && Model.CartItems.Any())
+                                {
+                                    @foreach (var item in Model.CartItems)
+                                    {
+                                        <tr>
+                                            <td class="px-3 py-2">@item.ProductName</td>
+                                            <td class="px-3 py-2 text-right">@item.Quantity</td>
+                                            <td class="px-3 py-2 text-right">@item.Price</td>
+                                            <td class="px-3 py-2 text-right font-semibold">@(item.Price * item.Quantity)</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="px-3 py-2 text-center text-gray-500">Your cart is empty</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[asp-controller="Panier"]');
+            const submitBtn = document.getElementById('submitOrderBtn');
+            
+            if (form && submitBtn) {
+                form.addEventListener('submit', function(e) {
+                    const addressInput = document.getElementById('Address');
+                    const paymentMethodSelect = document.getElementById('PaymentMethod');
+                    
+                    if (!addressInput || !paymentMethodSelect) {
+                        return;
+                    }
+                    
+                    const address = addressInput.value.trim();
+                    const paymentMethod = paymentMethodSelect.value;
+                    
+                    if (!address || !paymentMethod) {
+                        e.preventDefault();
+                        alert('Please fill in all required fields.');
+                        return false;
+                    }
+                    
+                    // Disable button during submission
+                    submitBtn.disabled = true;
+                    const buttonText = submitBtn.querySelector('#button-text');
+                    if (buttonText) {
+                        buttonText.textContent = 'Processing...';
+                    } else {
+                        submitBtn.textContent = 'Processing...';
+                    }
+                });
+            }
+        });
+    </script>
+}
